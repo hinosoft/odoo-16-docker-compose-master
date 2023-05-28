@@ -30,8 +30,8 @@ services:
       - POSTGRES_PASSWORD=odoo16@2022      
       - POSTGRES_DB=postgres
     restart: always             # run as a service
-    # volumes:
-    #     - ./postgresql:/var/lib/postgresql/data
+    volumes:
+        - ./postgresql:/var/lib/postgresql/data
 
   odoo16:
     platform: linux/x86_64
