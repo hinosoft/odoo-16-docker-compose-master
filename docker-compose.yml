@@ -13,6 +13,7 @@ services:
     volumes:
       - ./apps:/apps
       - ./core:/core
+      - ./reqirements.txt:/reqirements.txt
   nginx-ha:
     container_name: nginx_ha
     restart: always

@@ -9,3 +9,10 @@ sqlparse==0.4.2
 toml==0.10.2
 whitenoise==5.3.0
 django-environ==0.8.1
+djangorestframework==3.14.0 
+djangorestframework-simplejwt==5.2.2 
+pyjwt==2.7.0
+django-filter==23.2
+importlib-metadata==6.6.0 
+markdown==3.4.3 
+zipp==3.15.0
