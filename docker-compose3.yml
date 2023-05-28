@@ -1,27 +1,5 @@
-version: '3.9'
+version: '2'
 services:
-  hoaanh_app:
-    container_name: hoaanh_app
-    restart: always
-    env_file: .env
-    build: .
-    networks:
-      - db_network
-      - web_network
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-  nginx-ha:
-    container_name: nginx_ha
-    restart: always
-    image: "nginx:latest"
-    ports:
-      - "5016:5016"
-    volumes:
-      - ./nginx:/etc/nginx/conf.d
-    networks:
-      - web_network
-    depends_on: 
-      - hoaanh_app
   db:
     image: postgres:15
     user: root
@@ -34,7 +12,6 @@ services:
         - ./postgresql:/var/lib/postgresql/data
 
   odoo16:
-    platform: linux/x86_64
     image: odoo:16
     user: root
     depends_on:
@@ -55,9 +32,4 @@ services:
       - ./addons:/mnt/extra-addons
       - ./etc:/etc/odoo
     restart: always             # run as a service
-networks:
-  db_network:
-    driver: bridge
-  web_network:
-    driver: bridge
- 
+    
