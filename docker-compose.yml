@@ -10,6 +10,9 @@ services:
       - web_network
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    volumes:
+      - ./apps:/apps
+      - ./core:/core
   nginx-ha:
     container_name: nginx_ha
     restart: always
