@@ -20,6 +20,11 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env('SECRET_KEY', default='S#perS3crEt_007')
 
+SERVER_ENPOINT = env('SERVER_ENPOINT', default='https://erp-test.apecgroup.net')
+SERVER_DB = env('SERVER_DB', default='apecerp_sit')
+ROOT_USER = env('ROOT_USER', default='hanhchinhnhansu')
+ROOT_PASSWORD = env('ROOT_PASSWORD', default='123123')
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
@@ -41,8 +46,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework_simplejwt',
-    'apps.home'  # Enable the inner home (home)
+    'apps.home',  # Enable the inner home (home)
 
+    'apps.unities',
+    'apps.employees',
+    'apps.apiv1'
 ]
 
 REST_FRAMEWORK = {
