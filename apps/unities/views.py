@@ -3,10 +3,11 @@ from django.conf import settings
 import xmlrpc.client
 import pandas as pd
 
-url = SERVER_ENPOINT = settings.SERVER_ENPOINT
-db = SERVER_DB = settings.SERVER_DB
-username = ROOT_USER = settings.ROOT_USER
-password = ROOT_PASSWORD = settings.ROOT_PASSWORD
+url = 'https://erp-test.apecgroup.net'
+db = 'apecerp_sit'
+username = 'hanhchinhnhansu'
+password = '123123'
+
 
 class OdooModel:
     # Create your vie`ws here.
