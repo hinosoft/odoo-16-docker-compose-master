@@ -35,3 +35,4 @@ apps/static/assets/yarn.lock
 apps/static/assets/.temp
 apps/employees/migrations/
 apps/schedulings/migrations/
+apps/attendences/migrations/

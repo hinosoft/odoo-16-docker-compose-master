@@ -5,6 +5,7 @@ import pandas as pd
 from datetime import datetime
 from datetime import timedelta
 from apps.schedulings.models import Scheduling
+from apps.attendences.models import Tracking
 
 url = 'https://erp-test.apecgroup.net'
 db = 'apecerp_sit'
@@ -45,6 +46,29 @@ class OdooModel:
         return list_employees
     
 class SchedulingModel:
+    # ***************************************  SUMMARY REPORT ************************************
+    def merge_download_attendance (self):
+        # self.df_old = pd.read_excel(self.input_attendence_file , index_col=None, header=[0,] ,sheet_name='Sheet1')
+
+        self.df_old  = pd.DataFrame.from_records(
+            Tracking.objects.all().values_list('code', 'time'))
+        self.df_old = self.df_old.set_axis(['ID', 'Giờ'], axis=1, inplace=False)
+        self.df_old['is_from_explanation'] = False
+
+    def append_contract_data(self):
+        df_attendance_data = pd.read_excel(self.input_contract_file_path, index_col=None, header= [0] ,sheet_name='Sheet1',
+            converters={
+                'THỬ VIỆC ĐẾN NGÀY': lambda x: pd.to_datetime(x, format='%d/%m/%Y',  errors='coerce'),
+                'NGÀY NHẬN VIỆC TẠI CÔNG TY': lambda x: pd.to_datetime(x, format='%d/%m/%Y',  errors='coerce')
+            })
+        df_attendance_data =  df_attendance_data.drop_duplicates(subset=['MÃ NV MIS'], keep='first')
+        
+        self.report_shift_ver = self.report_shift_ver.merge(df_attendance_data[['MÃ NV MIS','NGÀY NHẬN VIỆC TẠI CÔNG TY', 'THỜI GIAN THỬ VIỆC', 'THỬ VIỆC ĐẾN NGÀY','SỐ HĐTV',
+                'NGÀY KÝ HĐLĐ LẦN 1', 'NGÀY HẾT HẠN HĐLĐ LẦN 1', 'SỐ HĐLĐ', 'Tỉ lệ hưởng lương TV']], \
+                left_on=['code'], right_on = ['MÃ NV MIS'], how='left', suffixes=( '' ,'_contract' ))
+        
+        self.report_shift_ver['is_probationary'] = self.report_shift_ver.apply(lambda x: (x['THỬ VIỆC ĐẾN NGÀY'] == None) or (pd.isnull(x['THỬ VIỆC ĐẾN NGÀY'])) or (x['date'] <= x['THỬ VIỆC ĐẾN NGÀY']), axis=1)
+
     def sync_data_scheduling(self):
         self.date_array = pd.date_range(start='05/01/2023', end='05/31/2023')
 
@@ -371,9 +395,83 @@ class SchedulingModel:
             
             
         return shift, shift_id, normal_time, scheduling, rest_shifts, fix_rest_time, night, label,  is_holiday, holiday_from, holiday_to, holiday_name
+    def conver_data(self, progress_callback=None):
+        if not self.is_prepared_data:
+            self.df_employees['time_keeping_code'] = pd.to_numeric(self.df_employees['time_keeping_code'], errors='coerce')
+            self.df_old = self.df_old.merge(self.df_employees[['id','code', 'department_id', 'name','time_keeping_code','job_title']], \
+                    left_on=['ID'], right_on = ['time_keeping_code'], how='left', suffixes=( '' ,'_employee' ))
+            # self.df_old .rename(columns={'id': 'employee_id'})
+            # self.df_old.to_excel("atempbc.xlsx", sheet_name='Sheet1') 
+            self.df_old['yearmonth']=self.df_old.apply(lambda row: self.process_hour(row), axis=1, result_type='expand') 
+        # self.df_old.to_excel(self.output_file, sheet_name='Sheet1') 
+        self.df_old[['shift_name', 'shift_id', 'normal_time', 'scheduling', 'rest_shifts', 'fix_rest_time', 'night' , 'label', \
+            'is_holiday', 'holiday_from', 'holiday_to', 'holiday_name']] = \
+            self.df_old.apply(lambda row: self.find_nearest(row), axis=1, result_type='expand') 
+
+        df_sort = self.df_old.sort_values(by=['ID', 'Giờ'], ascending=False)
+        self.result = df_sort.groupby(['ID', 'scheduling']).agg({'Giờ': ['mean', 'min', 'max']})
+        # self.df_old["In/out"] = self.df_old.apply(lambda row: self.process_content(row), axis=1, result_type='expand') 
+
+        df_mid_sort = self.df_old[(self.df_old["label"]=='In-Mid')].sort_values(by=['ID', 'Giờ'], ascending=False)
+        self.df_in_mid_result = df_mid_sort.groupby(['ID', 'scheduling']).agg({'Giờ': ['mean', 'min', 'max']})
+
+        df_mid_sort = self.df_old[(self.df_old["label"]=='Out-Mid')].sort_values(by=['ID', 'Giờ'], ascending=False)
+        self.df_out_mid_result = df_mid_sort.groupby(['ID', 'scheduling']).agg({'Giờ': ['mean', 'min', 'max']})
+
+        # find max time in and min timeout
+        df_attendence_group = self.df_old[~self.df_old['is_from_explanation']].sort_values(['Giờ']).groupby('scheduling')
+        # result = []
+        for g, data in df_attendence_group:
+            t_fist = None
+            t_last = None
+            t_mid_array = []
+            t_fist = data.iloc[0]['Giờ']
+            len_df = len(data['Giờ'])
+            if (len_df > 1):
+                t_last = data.iloc[len_df -1]['Giờ']
+            for item in data['Giờ']:
+                if item != t_fist and item != t_last:
+                    t_mid_array.append (item)
+
+            # result_item = {'scheduling': g, 't_fist': t_fist, 't_last': t_last, 't_mid_array': t_mid_array}
+            # result.append(result_item)
+            if g>=0:
+                max_time_in = t_fist
+                try:
+                    if max_time_in != None and  max_time_in.replace(second=0) < self.report_shift_ver['start_work_date_time'][g]:
+                        max_time_in = max([a for a in data['Giờ'] if a.replace(second=0) <= self.report_shift_ver['start_work_date_time'][g]])
+                except:
+                    self.report_shift_ver.to_excel('nho ti ti.xlsx')
+                min_time_out = t_last
+                try:
+                    if min_time_out != None and  min_time_out.replace(second=0) > self.report_shift_ver['end_work_date_time'][g]:
+                        min_time_out = min ([a for a in data['Giờ'] if a.replace(second=0) >= self.report_shift_ver['end_work_date_time'][g]])
+                except:
+                    self.df_old.to_excel('Hoi kho nhi.xlsx')
+
+                self.report_shift_ver.at[g, 'min_time_out'] = min_time_out
+                self.report_shift_ver.at[g, 'max_time_in'] = max_time_in
+
+            
+
+        self.df_old["In/out"] = self.df_old.apply(lambda row: self.process_content(row), axis=1, result_type='expand') 
+        print("Mean, min, and max values of Top Speed grouped by Vehicle Type")
+       
+        
+
+class AttendenceModel:
+    def from_excel(self, file_path):
+        df_old = pd.read_excel(file_path , index_col=None, header=[0,] ,sheet_name='Sheet1')
+        df_old.apply(lambda row: self.append_tracking(row), axis=1)
+    def append_tracking(self, row):
+        code = row['ID']
+        time = row['Giờ']
+        try:
+            tracking = Tracking(code= code, time= time)
+            tracking.save()
+        except Exception as ex:
+            print("tracking", ex)
 
 
 
-
-    
 

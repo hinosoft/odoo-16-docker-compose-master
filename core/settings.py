@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'apps.unities',
     'apps.employees',
     'apps.schedulings',
+    'apps.attendences',
     'apps.apiv1'
 ]
 
