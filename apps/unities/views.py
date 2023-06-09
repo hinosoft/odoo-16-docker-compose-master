@@ -52,7 +52,7 @@ class SchedulingModel:
 
         self.df_old  = pd.DataFrame.from_records(
             Tracking.objects.all().values_list('code', 'time'))
-        self.df_old = self.df_old.set_axis(['ID', 'Giờ'], axis=1, inplace=False)
+        self.df_old = self.df_old.set_axis(['ID', 'Giờ'], axis=1, copy=False)
         self.df_old['is_from_explanation'] = False
 
     def append_contract_data(self):
