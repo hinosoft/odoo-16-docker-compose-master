@@ -1,0 +1,237 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<style>
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  
+  tr:nth-child(even) {
+    background-color: rgba(150, 212, 212, 0.4);
+  }
+  
+  th:nth-child(even),td:nth-child(even) {
+    background-color: rgba(150, 212, 212, 0.4);
+  }
+  </style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="content">
+    <div class="row">
+      
+      <div class="col-md-12">
+        <div class="card ">
+          <div class="card-header">
+            <h4 class="card-title">Dữ liệu chấm công</h4>
+            <p class="category"><a>5/2023</a>
+              <a class="btn">Next</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="card  card-plain">
+        <div class="card-header">
+          <h4 class="card-title">DANH SÁCH CA</h4>
+          <p class="category"> Here is a subtitle for this table</p>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table tablesorter" id="">
+              <thead class=" text-primary">
+                <tr>
+                  <th>
+                    <button>OFF</button>
+                  </th>
+                  <th>
+                    <button>PH</button>
+                  </th>
+                  <th>
+                    <button>CL</button>
+                    <button>AL</button>
+                  </th>
+                  <th class="text-center">
+                    <button>5A</button>
+                    <button>6A</button>
+                    <button>7A</button>
+                    <button>8A</button>
+                    <button>9A</button>
+                    <button>10A</button>
+                    <button>11A</button>
+                    <button>12A</button>
+                    <button>13A</button>
+                  </th>
+                  
+                </tr>
+              </thead>
+              <tbody>
+               
+                <tr>
+                  <td>
+                    <button>SP1</button>
+                  </td>
+                  <td>
+                    <button>SP2</button>
+                  </td>
+                  <td>
+                    <button>SP3</button>
+                    <button>SP4</button>
+                  </td>
+                  <td class="text-center">
+                    <button>5B</button>
+                    <button>6B</button>
+                    <button>7B</button>
+                    <button>8B</button>
+                    <button>9B</button>
+                    <button>10B</button>
+                    <button>11B</button>
+                    <button>12B</button>
+                    <button>13B</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                  </td>
+                  <td>
+                    <button>SP5</button>
+                  </td>
+                  <td>
+                    <button>SP6</button>
+                    <button>SP7</button>
+                  </td>
+                  <td class="text-center">
+                    
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      
+      <div class="col-md-12">
+        <div class="card ">
+          <div class="card-header">
+            <h4 class="card-title">Tên phòng ban</h4>
+            </p>
+          </div>
+          
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table tablesorter " id="">
+                <thead class=" text-primary">
+                  <tr>
+                    <th>
+                      Name
+                    </th>
+                    <th>
+                      Mã NV
+                    </th>
+                    <th>
+                      Thứ 2
+                    </th>
+                    <th class="text-center">
+                      Thứ 3
+                    </th>
+                    <th class="text-center">
+                      Thứ 4
+                    </th>
+                    <th class="text-center">
+                      Thứ 5
+                    </th>
+                    <th class="text-center">
+                      Thứ 6
+                    </th>
+                    <th class="text-center">
+                      Thứ 7
+                    </th>
+                    <th class="text-center">
+                      CN
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      AliBaBa
+                    </td>
+                    <td>
+                      APG00123544
+                    </td>
+                    <td class="text-center">
+                      <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+                      <label for="vehicle1"> 8A</label><br>
+                    </td>
+                    <td class="text-center">
+                      <input type="checkbox" id="vehicle1_2" name="vehicle1_2" value="Bike">
+                      <label for="vehicle1"> 8A</label><br>
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      Ali Ba Bốn
+                    </td>
+                    <td>
+                      APG00123545
+                    </td>
+                    <td class="text-center">
+                      8A
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                    <td class="text-center">
+                      -
+                    </td>
+                  </tr>
+                 
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

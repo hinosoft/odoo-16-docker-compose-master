@@ -13,3 +13,4 @@ class UserViewSet(APIView):
         model = OdooModel()
         queryset = model.odoo_get_list_employee()
         return Response(queryset)
+
