@@ -18,6 +18,7 @@ urlpatterns = [
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path("api/employee/", include("apps.employees.urls")), # Auth routes - login / register
     path("api_v1/", include("apps.apiv1.urls")), # Auth routes - login / register
+    path("schedulings/", include("apps.schedulings.urls")),
     path("", include("apps.authentication.urls")), # Auth routes - login / register
 
     # # ADD NEW Routes HERE
