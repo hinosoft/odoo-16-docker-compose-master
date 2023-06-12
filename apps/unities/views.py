@@ -46,6 +46,9 @@ class OdooModel:
         return list_employees
     
 class SchedulingModel:
+    def process_hour(self,row):
+        return row['Giờ'].date()
+    
     # ***************************************  SUMMARY REPORT ************************************
     def merge_download_attendance (self):
         # self.df_old = pd.read_excel(self.input_attendence_file , index_col=None, header=[0,] ,sheet_name='Sheet1')
@@ -54,6 +57,66 @@ class SchedulingModel:
             Tracking.objects.all().values_list('code', 'time'))
         self.df_old = self.df_old.set_axis(['ID', 'Giờ'], axis=1, copy=False)
         self.df_old['is_from_explanation'] = False
+
+    def merge_scheduling_ver(self):
+        self.date_array = pd.date_range(start='05/01/2023', end='05/31/2023')
+
+        common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(url))
+        self.models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(url))
+        self.uid = common.authenticate(db, username, password, {})
+        
+        # Check acess
+        self.models.execute_kw(db, self.uid, password, 'res.partner', 'check_access_rights', ['read'], {'raise_exception': False})
+        self.models.execute_kw(db, self.uid, password, 'res.partner', 'search', [[['is_company', '=', True]]])
+
+        # Check deparment
+        department_ids = self.models.execute_kw(db, self.uid, password, 'hr.department','search', [[]])
+        list_departments  = self.models.execute_kw(db, self.uid, password, 'hr.department', 'read', [department_ids], {'fields': ['id','name', 'total_employee', 'company_id', 'member_ids']})
+        df_departments = pd.DataFrame.from_dict(list_departments)
+
+
+         # Check 'resource.calendar.leaves
+        resource_calendar_leaves_ids = self.models.execute_kw(db, self.uid, password, 'resource.calendar.leaves','search', [[]])
+        resource_calendar_leaves_list  = self.models.execute_kw(db, self.uid, password, 'resource.calendar.leaves', 'read', [resource_calendar_leaves_ids], \
+                                                          {'fields': ['id','name', 'company_id', 'calendar_id', 'date_from', 'date_to', 'resource_id', 'time_type']})
+        self.df_resource_calendar_leaves= pd.DataFrame.from_dict(resource_calendar_leaves_list)
+
+        # read shift infomation
+        ids = self.models.execute_kw(db, self.uid, password, 'shifts', 'search', [[]], {})
+        list_shifts  = self.models.execute_kw(db, self.uid, password, 'shifts', 'read', [ids], {'fields': ['id', 'name', 'start_work_time', 'end_work_time','total_work_time','start_rest_time','end_rest_time','rest_shifts', 'fix_rest_time', 'night']})
+
+        list_shifts.append({'id':-1, 'name':'-', 'start_work_time':12.00, 'end_work_time': 12.00, \
+                'total_work_time':0.00,'start_rest_time':12.00,'end_rest_time':12.00,'rest_shifts':True, 'fix_rest_time':False, 'night':False})
+        print (self.models.execute_kw(db, self.uid, password, 'shifts', 'fields_get', [], {'attributes': ['string', 'type']}))
+        self.df_shift = pd.DataFrame.from_dict(list_shifts)
+        # file_name = 'MarksData_df_shift.xlsx'
+        # saving the excel
+        # df_shift.to_excel(file_name)
+        # print('DataFrame shift is written to Excel File successfully.')
+
+   
+        employee_Sids = self.models.execute_kw(db, self.uid, password, 'hr.employee', 'search', [[]])
+        list_employees  = self.models.execute_kw(db, self.uid, password, 'hr.employee', 'read', [employee_Sids], {'fields': ['id', 'name', 'user_id', 'company_id', 'code', 'department_id', 'time_keeping_code', 'job_title']})
+        # The above code is iterating through a list of employees and checking if their
+        # 'time_keeping_code' attribute is not None. If it is not None, it removes the '.0' string
+        # from the end of the attribute value using the replace() method.
+        for employee in list_employees:
+            if employee['time_keeping_code'] != None:
+                employee['time_keeping_code'] = employee['time_keeping_code'].replace('.0', '')
+        self.df_employees = pd.DataFrame.from_dict(list_employees)
+
+        self.report_shift_ver  = pd.DataFrame.from_records(
+            Scheduling.objects.all().values_list('department_name', 'date', 'start_work_date_time', 'end_work_date_time', 'start_rest_date_time',
+                                                 'end_rest_date_time', 'employee_sid', 'name_employee', 'shift_name', 'shift_sid','fix_rest_time','night', 'rest_shifts'))
+        self.report_shift_ver = self.report_shift_ver.set_axis(['department_name','date', 'start_work_date_time', 'end_work_date_time', 'start_rest_date_time',
+                                                 'end_rest_date_time', 'employee_sid', 'name_employee', 'shift_name','shift', 'fix_rest_time', 'night','rest_shifts'], axis=1, copy=False)
+        self.report_shift_ver['employee_id'] = self.report_shift_ver['employee_sid']
+        self.calculate_normal_attendences_from_db()
+        
+        self.report_shift_ver['department_id']= self.report_shift_ver.apply(lambda row: ['',row['department_name']], axis=1)
+        
+        self.df_old['is_from_explanation'] = False
+
 
     def append_contract_data(self):
         df_attendance_data = pd.read_excel(self.input_contract_file_path, index_col=None, header= [0] ,sheet_name='Sheet1',
@@ -226,6 +289,39 @@ class SchedulingModel:
                     left_on=['shift'], right_on = ['id'], how='left', suffixes=( '' ,'_y')).drop(['id'], axis=1)
         # self.report_shift_ver.index = np.arange(1, len(self.report_shift_ver)+ 1)
 
+        self.calculate_normal_attendences()
+        print("*********************MERGE HOLYDAY*********************")
+        self.merge_calendar_leaves()
+        self.df_normal_attendances[['is_holiday', 'holiday_from', 'holiday_to', 'holiday_name']] = \
+            self.df_normal_attendances.apply(lambda row: self.merge_holiday(row), axis=1, result_type='expand')
+
+        # merge employee
+        self.report_shift_ver =  self.report_shift_ver.merge(self.df_employees[['id','code', 'department_id', 'name','job_title','time_keeping_code']], left_on=['employee_id'], right_on = ['id'], how='left', suffixes=( '' ,'_employee' ))
+        self.report_shift_ver.rename(columns = {'id':'employee_sid'}, inplace = True)
+        # Import to db 
+        self.report_shift_ver.apply(lambda row: self.update_report_scheduling_db(row), axis=1)
+    def calculate_normal_attendences_from_db(self):
+        normal_attendances = []
+        for index, row in self.report_shift_ver.iterrows():
+            
+
+            start_work_date_time = row['start_work_date_time']
+            end_work_date_time =  row['end_work_date_time']
+
+            
+
+            normal_attendances.append({"employee_id": row['employee_id'], 'shift':row['shift'], 'shift_name':row['shift_name'], 'time':start_work_date_time, 'scheduling': index, 
+                        'rest_shifts':row['rest_shifts'],'fix_rest_time': row['fix_rest_time'], 'night':row['night'],'label': 'In' })
+            normal_attendances.append({"employee_id": row['employee_id'], 'shift':row['shift'], 'shift_name':row['shift_name'], 'time':end_work_date_time, 'scheduling': index, 
+                        'rest_shifts':row['rest_shifts'],'fix_rest_time': row['fix_rest_time'], 'night':row['night'],'label': 'Out' })
+
+            
+        self.df_normal_attendances = pd.DataFrame.from_dict(normal_attendances)
+        print("*********************MERGE HOLYDAY*********************")
+        self.merge_calendar_leaves()
+        self.df_normal_attendances[['is_holiday', 'holiday_from', 'holiday_to', 'holiday_name']] = \
+            self.df_normal_attendances.apply(lambda row: self.merge_holiday(row), axis=1, result_type='expand')
+    def calculate_normal_attendences(self):
         normal_attendances = []
         for index, row in self.report_shift_ver.iterrows():
             start_work_time_h, start_work_time_m,start_work_time_s = float_to_hours (row['start_work_time'])
@@ -265,17 +361,6 @@ class SchedulingModel:
             self.report_shift_ver.at[index,'start_rest_date_time'] = start_rest_date_time
             self.report_shift_ver.at[index,'end_rest_date_time'] = end_rest_date_time
         self.df_normal_attendances = pd.DataFrame.from_dict(normal_attendances)
-        print("*********************MERGE HOLYDAY*********************")
-        self.merge_calendar_leaves()
-        self.df_normal_attendances[['is_holiday', 'holiday_from', 'holiday_to', 'holiday_name']] = \
-            self.df_normal_attendances.apply(lambda row: self.merge_holiday(row), axis=1, result_type='expand')
-
-        # merge employee
-        self.report_shift_ver =  self.report_shift_ver.merge(self.df_employees[['id','code', 'department_id', 'name','job_title','time_keeping_code']], left_on=['employee_id'], right_on = ['id'], how='left', suffixes=( '' ,'_employee' ))
-        self.report_shift_ver.rename(columns = {'id':'employee_sid'}, inplace = True)
-        # Import to db 
-        self.report_shift_ver.apply(lambda row: self.update_report_scheduling_db(row), axis=1)
-    
     ########################### 'resource.calendar.leaves
     def merge_holiday(self, row):
         is_holiday = False
@@ -322,7 +407,7 @@ class SchedulingModel:
         self.df_resource_calendar_leaves[['date_from', 'date_to']]= self.df_resource_calendar_leaves.apply(lambda row: self.refact_date_from(row), axis=1, result_type='expand')
         # self.df_resource_calendar_leaves['date_to']=self.df_resource_calendar_leaves.apply(lambda row: row['date_to'].replace(hour=23,minute=59,second=59), axis=1)
         print(self.df_resource_calendar_leaves)
-
+    
     def update_report_scheduling_db(self,row):
 
         scheduling_date = row['date']
@@ -335,6 +420,10 @@ class SchedulingModel:
         end_work_date_time = row['end_work_date_time']
         start_rest_date_time = row['start_rest_date_time']
         end_rest_date_time = row['end_rest_date_time']
+        shift_id = row['shift']
+        fix_rest_time = row['fix_rest_time']
+        night = row['night']
+        rest_shifts = row['rest_shifts'] 
         try:
             scheduling_object = Scheduling.objects.get(employee_code = employee_code, date=scheduling_date)
             
@@ -353,6 +442,10 @@ class SchedulingModel:
         scheduling_object.employee_sid = employee_sid if employee_sid else -1
         scheduling_object.name_employee = scheduling_emloyee_name
         scheduling_object.shift_name = scheduling_shift_name
+        scheduling_object.shift_sid = shift_id
+        scheduling_object.fix_rest_time = fix_rest_time
+        scheduling_object.night = night
+        scheduling_object.rest_shifts = rest_shifts
         scheduling_object.save()   
         
 
@@ -396,14 +489,57 @@ class SchedulingModel:
                 holiday_from = normal_shift_row['holiday_from']
                 holiday_to = normal_shift_row['holiday_to']
                 holiday_name = normal_shift_row['holiday_name']
-
+                # self.report_shift_ver.at[scheduling,'t_array'].append(row['Giờ'])
             # return shift, shift_id, normal_time, scheduling, rest_shifts, fix_rest_time, night ,label, is_holiday, holiday_from, holiday_to, holiday_name
         except Exception as ex:
             print('Find nearest errrrrrrrrr: ', ex)
             
             
         return shift, shift_id, normal_time, scheduling, rest_shifts, fix_rest_time, night, label,  is_holiday, holiday_from, holiday_to, holiday_name
+    
+    def convert_scheduling_date(self, row):
+        result = '-'
+        if pd.notnull( row['date']):
+            date_str = row['date'].strftime('%Y_%m_%d')   
+            result = date_str
+        
+        return result   
+    def merge_infomation_to_df(self):
+        """
+        Merge information to dfver
+        column t1, t2, t3,... t10, t_fist, t_last
+
+        """
+        self.df_attendence_group = self.df_old[~self.df_old['is_from_explanation']].sort_values(['Giờ']).groupby('scheduling')
+        result = []
+        for g, data in self.df_attendence_group:
+            t_fist = None
+            t_last = None
+            t_mid_array = []
+            t_fist = data.iloc[0]['Giờ']
+            len_df = len(data['Giờ'])
+            if (len_df > 1):
+                t_last = data.iloc[len_df -1]['Giờ']
+            for item in data['Giờ']:
+                if item != t_fist and item != t_last:
+                    t_mid_array.append (item)
+            result_item = {'scheduling': g, 't_fist': t_fist, 't_last': t_last, 't_mid_array': t_mid_array}
+
+            result.append(result_item)
+
+        self.df_attendence_hor= pd.DataFrame.from_dict(result)
+
+        self.report_shift_ver = self.report_shift_ver.merge(self.df_attendence_hor, left_index=True, right_on = ['scheduling'], how='left')
+        # self.report_shift_ver.to_excel(os.path.join(self.output_report_folder, 'convitso6.xlsx'), sheet_name='Sheet1') 
+
+        # merge self.df_attendance_data
+        self.report_shift_ver['date_str'] = self.report_shift_ver.apply(lambda row: self.convert_scheduling_date(row), axis=1, result_type='expand')
+        
+        # self.report_shift_ver = self.report_shift_ver.merge(self.append_explanation_data_collect, left_on=['code','date_str'], right_on=['Employee ID','date_str'], how='left')
+
+
     def conver_data(self, progress_callback=None):
+        # self.report_shift_ver['t_array'] = []
         # if not self.is_prepared_data:
         self.df_employees['time_keeping_code'] = pd.to_numeric(self.df_employees['time_keeping_code'], errors='coerce')
         self.df_old = self.df_old.merge(self.df_employees[['id','code', 'department_id', 'name','time_keeping_code','job_title']], \
@@ -415,54 +551,55 @@ class SchedulingModel:
         self.df_old[['shift_name', 'shift_id', 'normal_time', 'scheduling', 'rest_shifts', 'fix_rest_time', 'night' , 'label', \
             'is_holiday', 'holiday_from', 'holiday_to', 'holiday_name']] = \
             self.df_old.apply(lambda row: self.find_nearest(row), axis=1, result_type='expand') 
+        
+        self.merge_infomation_to_df()
+        # df_sort = self.df_old.sort_values(by=['ID', 'Giờ'], ascending=False)
+        # self.result = df_sort.groupby(['ID', 'scheduling']).agg({'Giờ': ['mean', 'min', 'max']})
+        # # self.df_old["In/out"] = self.df_old.apply(lambda row: self.process_content(row), axis=1, result_type='expand') 
 
-        df_sort = self.df_old.sort_values(by=['ID', 'Giờ'], ascending=False)
-        self.result = df_sort.groupby(['ID', 'scheduling']).agg({'Giờ': ['mean', 'min', 'max']})
-        # self.df_old["In/out"] = self.df_old.apply(lambda row: self.process_content(row), axis=1, result_type='expand') 
+        # df_mid_sort = self.df_old[(self.df_old["label"]=='In-Mid')].sort_values(by=['ID', 'Giờ'], ascending=False)
+        # self.df_in_mid_result = df_mid_sort.groupby(['ID', 'scheduling']).agg({'Giờ': ['mean', 'min', 'max']})
 
-        df_mid_sort = self.df_old[(self.df_old["label"]=='In-Mid')].sort_values(by=['ID', 'Giờ'], ascending=False)
-        self.df_in_mid_result = df_mid_sort.groupby(['ID', 'scheduling']).agg({'Giờ': ['mean', 'min', 'max']})
+        # df_mid_sort = self.df_old[(self.df_old["label"]=='Out-Mid')].sort_values(by=['ID', 'Giờ'], ascending=False)
+        # self.df_out_mid_result = df_mid_sort.groupby(['ID', 'scheduling']).agg({'Giờ': ['mean', 'min', 'max']})
 
-        df_mid_sort = self.df_old[(self.df_old["label"]=='Out-Mid')].sort_values(by=['ID', 'Giờ'], ascending=False)
-        self.df_out_mid_result = df_mid_sort.groupby(['ID', 'scheduling']).agg({'Giờ': ['mean', 'min', 'max']})
+        # # find max time in and min timeout
+        # df_attendence_group = self.df_old[~self.df_old['is_from_explanation']].sort_values(['Giờ']).groupby('scheduling')
+        # # result = []
+        # for g, data in df_attendence_group:
+        #     t_fist = None
+        #     t_last = None
+        #     t_mid_array = []
+        #     t_fist = data.iloc[0]['Giờ']
+        #     len_df = len(data['Giờ'])
+        #     if (len_df > 1):
+        #         t_last = data.iloc[len_df -1]['Giờ']
+        #     for item in data['Giờ']:
+        #         if item != t_fist and item != t_last:
+        #             t_mid_array.append (item)
 
-        # find max time in and min timeout
-        df_attendence_group = self.df_old[~self.df_old['is_from_explanation']].sort_values(['Giờ']).groupby('scheduling')
-        # result = []
-        for g, data in df_attendence_group:
-            t_fist = None
-            t_last = None
-            t_mid_array = []
-            t_fist = data.iloc[0]['Giờ']
-            len_df = len(data['Giờ'])
-            if (len_df > 1):
-                t_last = data.iloc[len_df -1]['Giờ']
-            for item in data['Giờ']:
-                if item != t_fist and item != t_last:
-                    t_mid_array.append (item)
+        #     # result_item = {'scheduling': g, 't_fist': t_fist, 't_last': t_last, 't_mid_array': t_mid_array}
+        #     # result.append(result_item)
+        #     if g>=0:
+        #         max_time_in = t_fist
+        #         try:
+        #             if max_time_in != None and  max_time_in.replace(second=0) < self.report_shift_ver['start_work_date_time'][g]:
+        #                 max_time_in = max([a for a in data['Giờ'] if a.replace(second=0) <= self.report_shift_ver['start_work_date_time'][g]])
+        #         except:
+        #             self.report_shift_ver.to_excel('nho ti ti.xlsx')
+        #         min_time_out = t_last
+        #         try:
+        #             if min_time_out != None and  min_time_out.replace(second=0) > self.report_shift_ver['end_work_date_time'][g]:
+        #                 min_time_out = min ([a for a in data['Giờ'] if a.replace(second=0) >= self.report_shift_ver['end_work_date_time'][g]])
+        #         except:
+        #             self.df_old.to_excel('Hoi kho nhi.xlsx')
 
-            # result_item = {'scheduling': g, 't_fist': t_fist, 't_last': t_last, 't_mid_array': t_mid_array}
-            # result.append(result_item)
-            if g>=0:
-                max_time_in = t_fist
-                try:
-                    if max_time_in != None and  max_time_in.replace(second=0) < self.report_shift_ver['start_work_date_time'][g]:
-                        max_time_in = max([a for a in data['Giờ'] if a.replace(second=0) <= self.report_shift_ver['start_work_date_time'][g]])
-                except:
-                    self.report_shift_ver.to_excel('nho ti ti.xlsx')
-                min_time_out = t_last
-                try:
-                    if min_time_out != None and  min_time_out.replace(second=0) > self.report_shift_ver['end_work_date_time'][g]:
-                        min_time_out = min ([a for a in data['Giờ'] if a.replace(second=0) >= self.report_shift_ver['end_work_date_time'][g]])
-                except:
-                    self.df_old.to_excel('Hoi kho nhi.xlsx')
-
-                self.report_shift_ver.at[g, 'min_time_out'] = min_time_out
-                self.report_shift_ver.at[g, 'max_time_in'] = max_time_in
+        #         self.report_shift_ver.at[g, 'min_time_out'] = min_time_out
+        #         self.report_shift_ver.at[g, 'max_time_in'] = max_time_in
 
             
-
-        self.df_old["In/out"] = self.df_old.apply(lambda row: self.process_content(row), axis=1, result_type='expand') 
+        # # Cai nay tu tu thay duoc
+        # self.df_old["In/out"] = self.df_old.apply(lambda row: self.process_content(row), axis=1, result_type='expand') 
         print("Mean, min, and max values of Top Speed grouped by Vehicle Type")
        
         
