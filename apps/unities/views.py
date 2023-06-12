@@ -331,6 +331,10 @@ class SchedulingModel:
         employee_code = row['code']
         department_id = row['department_id']
         employee_sid = row['employee_sid']
+        start_work_date_time = row['start_work_date_time']
+        end_work_date_time = row['end_work_date_time']
+        start_rest_date_time = row['start_rest_date_time']
+        end_rest_date_time = row['end_rest_date_time']
         try:
             scheduling_object = Scheduling.objects.get(employee_code = employee_code, date=scheduling_date)
             
@@ -342,6 +346,10 @@ class SchedulingModel:
             if len(department_id) > 1:
                 department_name = department_id[1]
         scheduling_object.department_name = department_name
+        scheduling_object.start_work_date_time = start_work_date_time
+        scheduling_object.end_work_date_time = end_work_date_time
+        scheduling_object.start_rest_date_time = start_rest_date_time
+        scheduling_object.end_rest_date_time = end_rest_date_time
         scheduling_object.employee_sid = employee_sid if employee_sid else -1
         scheduling_object.name_employee = scheduling_emloyee_name
         scheduling_object.shift_name = scheduling_shift_name
@@ -396,13 +404,13 @@ class SchedulingModel:
             
         return shift, shift_id, normal_time, scheduling, rest_shifts, fix_rest_time, night, label,  is_holiday, holiday_from, holiday_to, holiday_name
     def conver_data(self, progress_callback=None):
-        if not self.is_prepared_data:
-            self.df_employees['time_keeping_code'] = pd.to_numeric(self.df_employees['time_keeping_code'], errors='coerce')
-            self.df_old = self.df_old.merge(self.df_employees[['id','code', 'department_id', 'name','time_keeping_code','job_title']], \
-                    left_on=['ID'], right_on = ['time_keeping_code'], how='left', suffixes=( '' ,'_employee' ))
-            # self.df_old .rename(columns={'id': 'employee_id'})
-            # self.df_old.to_excel("atempbc.xlsx", sheet_name='Sheet1') 
-            self.df_old['yearmonth']=self.df_old.apply(lambda row: self.process_hour(row), axis=1, result_type='expand') 
+        # if not self.is_prepared_data:
+        self.df_employees['time_keeping_code'] = pd.to_numeric(self.df_employees['time_keeping_code'], errors='coerce')
+        self.df_old = self.df_old.merge(self.df_employees[['id','code', 'department_id', 'name','time_keeping_code','job_title']], \
+                left_on=['ID'], right_on = ['time_keeping_code'], how='left', suffixes=( '' ,'_employee' ))
+        # self.df_old .rename(columns={'id': 'employee_id'})
+        # self.df_old.to_excel("atempbc.xlsx", sheet_name='Sheet1') 
+        self.df_old['yearmonth']=self.df_old.apply(lambda row: self.process_hour(row), axis=1, result_type='expand') 
         # self.df_old.to_excel(self.output_file, sheet_name='Sheet1') 
         self.df_old[['shift_name', 'shift_id', 'normal_time', 'scheduling', 'rest_shifts', 'fix_rest_time', 'night' , 'label', \
             'is_holiday', 'holiday_from', 'holiday_to', 'holiday_name']] = \
