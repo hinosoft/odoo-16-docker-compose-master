@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import Scheduling
 from django.views.generic import ListView
 import pandas as pd
+
 # Create your views here.
 from functools import reduce
 def reducer(acc,el):
@@ -34,21 +35,25 @@ class SchedulingListView(ListView):
         context = super(SchedulingListView, self).get_context_data(**kwargs)
         # df = pd.DataFrame.from_records(self.get_queryset())
         df = pd.DataFrame.from_records(
-            Scheduling.objects.all().values_list('department_name', 'name_employee', 'employee_code', 'date', 'shift_name'))
+            Scheduling.objects.all().values_list('department_name', 'name_employee','employee_code', 'date', 'shift_name'),
+            columns=['department_name', 'name_employee','employee_code', 'date', 'shift_name'])
+        print("11111",(df.columns))
         
-        df['weekday'] = df.apply(lambda row: row[3].weekday(), axis=1)
-        print(df.head())
+        df['weekday'] = df['date'].apply(lambda row:row[3].weekday(), axis=1)
+        # df['weekday'] = pd.Series(df['date']).apply(lambda row: row[3].weekday())
+        # df['weekday'] = df['date'].apply(lambda row: row[3].weekday())
+        
+        # print(df.head())
         results = []
-        for g, data in df.groupby(0):
+        for g, data in df.groupby('department_name'):
             group_data = []
-            for g_code, data_code in data.groupby(2):
-                fist_employee = data_code.iloc[0]
-                item = {'department_name':g, 'name_employee': fist_employee[1], 'employee_code': g_code, 'D0':'', \
-                    'D1':'', 'D2':'', 'D3':'', 'D4':'', 'D5':'',  'D6':''}
+            for g_code, data_code in data.groupby('employee_code'):
+                fist_employee = data_code.iloc['department_name']
+                item = {'department_name':g, 'name_employee': fist_employee[1], 'employee_code': g_code, 'D0':'', 'D1':'', 'D2':'', 'D3':'', 'D4':'', 'D5':'',  'D6':''}
                 for sub_g, sub_data in data_code.groupby('weekday'):
-                    fist_row = sub_data.iloc[0]
-                    item['name_employee'] = fist_row[1]
-                    item[f'D{sub_g}'] = fist_row[4]
+                    fist_row = sub_data.iloc['department_name']
+                    item['name_employee'] = fist_row['name_employee']
+                    item[f'D{sub_g}'] = fist_row['shift_name']
                 group_data.append(item)
             results.append({'department':g, 'data':group_data})
             print(g)
