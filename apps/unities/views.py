@@ -609,6 +609,7 @@ class AttendenceModel:
         df_old = pd.read_excel(file_path , index_col=None, header=[0,] ,sheet_name='Sheet1')
         df_old.apply(lambda row: self.append_tracking(row), axis=1)
     def append_tracking(self, row):
+        # print('----------',row['ID'])
         code = row['ID']
         time = row['Giờ']
         try:

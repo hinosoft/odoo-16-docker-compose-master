@@ -9,7 +9,7 @@ scheduling.sync_data_scheduling()
 # merge_infomation_to_d
 
 att = AttendenceModel()
-att.append_tracking('C:/Users/HP/Documents/Github/black-dashboard-django-master/Apec-Convert-Data/unity/template/In/DLCC Mũi Né 16.5.23_full.xlsx')
+att.from_excel('C:/Users/Admin/Downloads/DLCC Mũi Né 16.5.23_full.xlsx')
 
 scheduling.merge_download_attendance()
 scheduling.merge_scheduling_ver()

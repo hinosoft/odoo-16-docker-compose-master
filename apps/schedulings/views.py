@@ -2,6 +2,7 @@ from django.shortcuts import render
 from .models import Scheduling
 from django.views.generic import ListView
 import pandas as pd
+
 # Create your views here.
 from functools import reduce
 def reducer(acc,el):
@@ -34,17 +35,18 @@ class SchedulingListView(ListView):
         context = super(SchedulingListView, self).get_context_data(**kwargs)
         # df = pd.DataFrame.from_records(self.get_queryset())
         df = pd.DataFrame.from_records(
-            Scheduling.objects.all().values_list('department_name', 'name_employee', 'employee_code', 'date', 'shift_name'))
+            Scheduling.objects.all().values_list('department_name', 'name_employee','employee_code', 'date', 'shift_name'))
+        print("11111",(df.columns))
         
-        df['weekday'] = df.apply(lambda row: row[3].weekday(), axis=1)
-        print(df.head())
+        df['weekday'] = df.apply(lambda row:row[3].weekday(), axis=1)
+        
+        # print(df.head())
         results = []
         for g, data in df.groupby(0):
             group_data = []
             for g_code, data_code in data.groupby(2):
                 fist_employee = data_code.iloc[0]
-                item = {'department_name':g, 'name_employee': fist_employee[1], 'employee_code': g_code, 'D0':'', \
-                    'D1':'', 'D2':'', 'D3':'', 'D4':'', 'D5':'',  'D6':''}
+                item = {'department_name':g, 'name_employee': fist_employee[1], 'employee_code': g_code, 'D0':'', 'D1':'', 'D2':'', 'D3':'', 'D4':'', 'D5':'',  'D6':''}
                 for sub_g, sub_data in data_code.groupby('weekday'):
                     fist_row = sub_data.iloc[0]
                     item['name_employee'] = fist_row[1]

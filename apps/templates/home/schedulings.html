@@ -4,7 +4,23 @@
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
+
 <style>
+  card-plain {
+    position: fixed;
+    left:0px;
+    right:0px;
+    top:100px;
+  }
+
+  .content {
+    position: absolute;
+  }
+
+  .row12 {
+    display: flex;
+  }
+
   table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
@@ -18,105 +34,150 @@
     background-color: rgba(150, 212, 212, 0.4);
   }
   </style>
+
+  
 {% endblock stylesheets %}
 
 {% block content %}
 
   <div class="content">
-    <div class="row">
-      
+    <div class="col-md-12 row12">
+    <div class="col-md-8">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card ">
+            <div class="card-header">
+              <h4 class="card-title">Dữ liệu chấm công</h4>
+              <p class="category"><a>5/2023</a>
+                <a class="btn">Next</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="col-md-12">
-        <div class="card ">
+        <div class="card  card-plain">
           <div class="card-header">
-            <h4 class="card-title">Dữ liệu chấm công</h4>
-            <p class="category"><a>5/2023</a>
-              <a class="btn">Next</a>
+            <h4 class="card-title">DANH SÁCH CA</h4>
+            <p class="category"> Here is a subtitle for this table</p>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table tablesorter" id="">
+                <thead class=" text-primary">
+                  <tr>
+                    <th>
+                      <button id = "btn_off" onclick="changeData(this,'OFF')" >OFF</button>
+                    </th>
+                    <th>
+                      <button id = "btn_ph" onclick="changeData(this,'PH')">PH</button>
+                    </th>
+                    <th>
+                      <button id = "btn_cl" onclick="changeData(this,'CL')">CL</button>
+                      <button id = "btn_al" onclick="changeData(al)">AL</button>
+                    </th>
+                    <th class="text-center">
+                      <button id = "btn_5a" onclick="changeData(this,'5A')">5A</button>
+                      <button id = "btn_6a" onclick="changeData(this,'6A')">6A</button>
+                      <button id = "btn_7a" onclick="changeData(this,'7A')">7A</button>
+                      <button id = "btn_8a" onclick="changeData(this,'8A')">8A</button>
+                      <button id = "btn_9a" onclick="changeData(this,'9A')">9A</button>
+                      <button id = "btn_10a" onclick="changeData(this,'10A')">10A</button>
+                      <button id = "btn_11a" onclick="changeData(this,'11A')">11A</button>
+                      <button id = "btn_12a" onclick="changeData(this,'12A')">12A</button>
+                      <button id = "btn_13a" onclick="changeData(this,'13A')">13A</button>
+                    </th>
+                    
+                  </tr>
+                </thead>
+                <tbody>
+                
+                  <tr>
+                    <td>
+                      <button id = "btn_sp1" onclick="changeData(this,'SP1')">SP1</button>
+                    </td>
+                    <td>
+                      <button id = "btn_sp2" onclick="changeData(this,'SP2')">SP2</button>
+                    </td>
+                    <td>
+                      <button id = "btn_sp3" onclick="changeData(this,'SP3')">SP3</button>
+                      <button id = "btn_sp4" onclick="changeData(this,'SP4')">SP4</button>
+                    </td>
+                    <td class="text-center">
+                      <button id = "btn_5b" onclick="changeData(this,'5B')">5B</button>
+                      <button id = "btn_6b" onclick="changeData(this,'6B')">6B</button>
+                      <button id = "btn_7b" onclick="changeData(this,'7B')">7B</button>
+                      <button id = "btn_8b" onclick="changeData(this,'8B')">8B</button>
+                      <button id = "btn_9b" onclick="changeData(this,'9B')">9B</button>
+                      <button id = "btn_10b" onclick="changeData(this,'10B')">10B</button>
+                      <button id = "btn_11b" onclick="changeData(this,'11B')">11B</button>
+                      <button id = "btn_12b" onclick="changeData(this,'12B')">12B</button>
+                      <button id = "btn_13b" onclick="changeData(this,'13B')">13B</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                    </td>
+                    <td>
+                      <button id = "btn_sp5" onclick="changeData(this,'SP5')">SP5</button>
+                    </td>
+                    <td>
+                      <button id = "btn_sp6" onclick="changeData(this,'SP6')">SP6</button>
+                      <button id = "btn_sp7" onclick="changeData(this,'SP7')">SP7</button>
+                    </td>
+                    <td class="text-center">
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-user">
+      <div class="card-body">
+        <p class="card-text">
+          <div class="author">
+            <div class="block block-one"></div>
+            <div class="block block-two"></div>
+            <div class="block block-three"></div>
+            <div class="block block-four"></div>
+            <a href="javascript:void(0)">
+              <img class="avatar" src="{{ ASSETS_ROOT }}/img/emilyz.jpg" alt="...">
+              <h5 class="title">Mike Andrew</h5>
+            </a>
+            <p class="description">
+              Ceo/Co-Founder
             </p>
           </div>
+        </p>
+        <div class="card-description">
+          Do not be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="button-container">
+          <button href="javascript:void(0)" class="btn btn-icon btn-round btn-facebook">
+            <i class="fab fa-facebook"></i>
+          </button>
+          <button href="javascript:void(0)" class="btn btn-icon btn-round btn-twitter">
+            <i class="fab fa-twitter"></i>
+          </button>
+          <button href="javascript:void(0)" class="btn btn-icon btn-round btn-google">
+            <i class="fab fa-google-plus"></i>
+          </button>
         </div>
       </div>
     </div>
-    <div class="col-md-12">
-      <div class="card  card-plain">
-        <div class="card-header">
-          <h4 class="card-title">DANH SÁCH CA</h4>
-          <p class="category"> Here is a subtitle for this table</p>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table tablesorter" id="">
-              <thead class=" text-primary">
-                <tr>
-                  <th>
-                    <button>OFF</button>
-                  </th>
-                  <th>
-                    <button>PH</button>
-                  </th>
-                  <th>
-                    <button>CL</button>
-                    <button>AL</button>
-                  </th>
-                  <th class="text-center">
-                    <button>5A</button>
-                    <button>6A</button>
-                    <button>7A</button>
-                    <button>8A</button>
-                    <button>9A</button>
-                    <button>10A</button>
-                    <button>11A</button>
-                    <button>12A</button>
-                    <button>13A</button>
-                  </th>
-                  
-                </tr>
-              </thead>
-              <tbody>
-               
-                <tr>
-                  <td>
-                    <button>SP1</button>
-                  </td>
-                  <td>
-                    <button>SP2</button>
-                  </td>
-                  <td>
-                    <button>SP3</button>
-                    <button>SP4</button>
-                  </td>
-                  <td class="text-center">
-                    <button>5B</button>
-                    <button>6B</button>
-                    <button>7B</button>
-                    <button>8B</button>
-                    <button>9B</button>
-                    <button>10B</button>
-                    <button>11B</button>
-                    <button>12B</button>
-                    <button>13B</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                  </td>
-                  <td>
-                    <button>SP5</button>
-                  </td>
-                  <td>
-                    <button>SP6</button>
-                    <button>SP7</button>
-                  </td>
-                  <td class="text-center">
-                    
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
+  </div>
+</div>
+
+
+    <div class="row data">
       {% for department_data in schedulings %}
       <div class="col-md-12">
         <div class="card ">
@@ -175,32 +236,33 @@
                       {{ scheduling.name_employee }}
                     </td>
                     <td class="text-center">
-                      <input type="checkbox" id="{{ scheduling.employee_code }}_T2" name="vehicle1" value="Bike">
-                      <label for="vehicle1"> {{ scheduling.D0 }}</label><br>
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T2" name="vehicle1">
+                      <label for="{{ scheduling.employee_code }}_T2" id="{{ scheduling.employee_code }}_T2_scheduling"> {{ scheduling.D0 }}</label><br>
                     </td>
                     <td class="text-center">
-                      <input type="checkbox" id="{{ scheduling.employee_code }}_T3" value="Bike">
-                      <label for="vehicle1"> {{ scheduling.D1 }}</label><br>
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T3">
+                      <label for="{{ scheduling.employee_code }}_T3" id="{{ scheduling.employee_code }}_T3_scheduling"> {{ scheduling.D1 }}</label><br>
                     </td>
                     <td class="text-center">
-                      <input type="checkbox" id="{{ scheduling.employee_code }}_T4" value="Bike">
-                      {{scheduling.D2}}
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T4">
+                      <label for="{{ scheduling.employee_code }}_T4" id="{{ scheduling.employee_code }}_T4_scheduling"> {{ scheduling.D2 }}</label><br>
+                    </td>
                     </td>
                     <td class="text-center">
-                      <input type="checkbox" id="{{ scheduling.employee_code }}_T5" value="Bike">
-                      {{scheduling.D3}}
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T5">
+                      <label for="{{ scheduling.employee_code }}_T5" id="{{ scheduling.employee_code }}_T5_scheduling"> {{ scheduling.D3 }}</label><br>
                     </td>
                     <td class="text-center">
-                      <input type="checkbox" id="{{ scheduling.employee_code }}_T6" value="Bike">
-                      {{scheduling.D4}}
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T6">
+                      <label for="{{ scheduling.employee_code }}_T6" id="{{ scheduling.employee_code }}_T6_scheduling"> {{ scheduling.D4 }}</label><br>
                     </td>
                     <td class="text-center">
-                      <input type="checkbox" id="{{ scheduling.employee_code }}_T7" value="Bike">
-                      {{scheduling.D5}}
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T7">
+                      <label for="{{ scheduling.employee_code }}_T7" id="{{ scheduling.employee_code }}_T7_scheduling"> {{ scheduling.D5 }}</label><br>
                     </td>
                     <td class="text-center">
-                      <input type="checkbox" id="{{ scheduling.employee_code }}_CN" value="Bike">
-                      {{scheduling.D6}}
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_CN">
+                      <label for="{{ scheduling.employee_code }}_CN" id="{{ scheduling.employee_code }}_CN_scheduling"> {{ scheduling.D6 }}</label><br>
                     </td>
                   </tr>
                   {% endfor %}
@@ -220,4 +282,40 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+  
+
+function changeData(checkbox, newtext) {
+  var checkedIds = [];
+  var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+  for (var i = 0; i < checkboxes.length; i++) {
+    if (checkboxes[i].checked) {
+      checkedIds.push(checkboxes[i].id); 
+    }
+  }
+  var modifiedIds = checkedIds.map(function(id) {
+    return id + '_scheduling';
+  });
+  console.log(modifiedIds);
+
+  for (var j = 0; j < modifiedIds.length; j++) {
+    var label = document.getElementById(modifiedIds[j]);
+    if (label) {
+      // Thay đổi text của label ở đây
+      label.textContent = newtext;
+    }
+  }
+}
+
+var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+checkboxes.forEach(function(checkbox) {
+  checkbox.addEventListener('change', function() {
+    var newtext = " ";
+    changeData(this, newtext);
+  });
+});
+
+    
+</script>
+{% endblock javascripts %}
