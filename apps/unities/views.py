@@ -107,9 +107,9 @@ class SchedulingModel:
 
         self.report_shift_ver  = pd.DataFrame.from_records(
             Scheduling.objects.all().values_list('department_name', 'date', 'start_work_date_time', 'end_work_date_time', 'start_rest_date_time',
-                                                 'end_rest_date_time', 'employee_sid', 'name_employee', 'shift_name', 'shift_sid','fix_rest_time','night', 'rest_shifts'))
+                                                 'end_rest_date_time', 'employee_sid', 'name_employee', 'shift_name', 'shift_sid','fix_rest_time','night', 'rest_shifts', 'time_keeping_code'))
         self.report_shift_ver = self.report_shift_ver.set_axis(['department_name','date', 'start_work_date_time', 'end_work_date_time', 'start_rest_date_time',
-                                                 'end_rest_date_time', 'employee_sid', 'name_employee', 'shift_name','shift', 'fix_rest_time', 'night','rest_shifts'], axis=1, copy=False)
+                                                 'end_rest_date_time', 'employee_sid', 'name_employee', 'shift_name','shift', 'fix_rest_time', 'night','rest_shifts','time_keeping_code'], axis=1, copy=False)
         self.report_shift_ver['employee_id'] = self.report_shift_ver['employee_sid']
         self.calculate_normal_attendences_from_db()
         
@@ -311,9 +311,9 @@ class SchedulingModel:
             
 
             normal_attendances.append({"employee_id": row['employee_id'], 'shift':row['shift'], 'shift_name':row['shift_name'], 'time':start_work_date_time, 'scheduling': index, 
-                        'rest_shifts':row['rest_shifts'],'fix_rest_time': row['fix_rest_time'], 'night':row['night'],'label': 'In' })
+                        'rest_shifts':row['rest_shifts'],'fix_rest_time': row['fix_rest_time'], 'night':row['night'],'label': 'In' }, time_keeping_code = int(row['time_keeping_code']))
             normal_attendances.append({"employee_id": row['employee_id'], 'shift':row['shift'], 'shift_name':row['shift_name'], 'time':end_work_date_time, 'scheduling': index, 
-                        'rest_shifts':row['rest_shifts'],'fix_rest_time': row['fix_rest_time'], 'night':row['night'],'label': 'Out' })
+                        'rest_shifts':row['rest_shifts'],'fix_rest_time': row['fix_rest_time'], 'night':row['night'],'label': 'Out' }, time_keeping_code = int(row['time_keeping_code']))
 
             
         self.df_normal_attendances = pd.DataFrame.from_dict(normal_attendances)
@@ -424,6 +424,7 @@ class SchedulingModel:
         fix_rest_time = row['fix_rest_time']
         night = row['night']
         rest_shifts = row['rest_shifts'] 
+        time_keeping_code = row['time_keeping_code']
         try:
             scheduling_object = Scheduling.objects.get(employee_code = employee_code, date=scheduling_date)
             
@@ -446,6 +447,7 @@ class SchedulingModel:
         scheduling_object.fix_rest_time = fix_rest_time
         scheduling_object.night = night
         scheduling_object.rest_shifts = rest_shifts
+        scheduling_object.time_keeping_code = time_keeping_code
         scheduling_object.save()   
         
 
@@ -465,7 +467,7 @@ class SchedulingModel:
         label = ''
         scheduling = -1
         try: 
-            df_compare = self.df_normal_attendances[self.df_normal_attendances['employee_id']==row['id']].sort_values(by=['time'])
+            df_compare = self.df_normal_attendances[self.df_normal_attendances['time_keeping_code']==row['id']].sort_values(by=['time'])
             if len(df_compare['time'])>0:
                 dates = df_compare['time'].to_list()
                 min_time = min(dates, key=lambda d: abs(d-row['Giờ']))
@@ -538,12 +540,13 @@ class SchedulingModel:
         # self.report_shift_ver = self.report_shift_ver.merge(self.append_explanation_data_collect, left_on=['code','date_str'], right_on=['Employee ID','date_str'], how='left')
 
 
-    def conver_data(self, progress_callback=None):
+    def conver_data_from_db(self, progress_callback=None):
         # self.report_shift_ver['t_array'] = []
         # if not self.is_prepared_data:
-        self.df_employees['time_keeping_code'] = pd.to_numeric(self.df_employees['time_keeping_code'], errors='coerce')
-        self.df_old = self.df_old.merge(self.df_employees[['id','code', 'department_id', 'name','time_keeping_code','job_title']], \
-                left_on=['ID'], right_on = ['time_keeping_code'], how='left', suffixes=( '' ,'_employee' ))
+        # self.df_employees['time_keeping_code'] = pd.to_numeric(self.df_employees['time_keeping_code'], errors='coerce')
+        self.df_normal_attendances['time_keeping_code'] = pd.to_numeric(self.df_normal_attendances['time_keeping_code'], errors='coerce')
+        # self.df_old = self.df_old.merge(self.df_employees[['id','code', 'department_id', 'name','time_keeping_code','job_title']], \
+        #         left_on=['ID'], right_on = ['time_keeping_code'], how='left', suffixes=( '' ,'_employee' ))
         # self.df_old .rename(columns={'id': 'employee_id'})
         # self.df_old.to_excel("atempbc.xlsx", sheet_name='Sheet1') 
         self.df_old['yearmonth']=self.df_old.apply(lambda row: self.process_hour(row), axis=1, result_type='expand') 
