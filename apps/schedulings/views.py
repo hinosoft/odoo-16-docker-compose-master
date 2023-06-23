@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from .models import Scheduling
-from django.views.generic import ListView
+from django.views.generic import ListView, View
 import pandas as pd
-
+from django.http import JsonResponse
 # Create your views here.
 from functools import reduce
 def reducer(acc,el):
@@ -12,8 +12,20 @@ def reducer(acc,el):
     else:
         acc[group].append(el['name_employee'])
     return acc
+<<<<<<< HEAD
 
 
+=======
+class GetSchedulingDetailView(View):
+    def get(self, request, *args, **kwargs):
+        return JsonResponse(
+            {
+                # "asinid": self.asin_obj.id,
+                "command": 1,
+                'next_url': 1
+            }
+        )
+>>>>>>> 3c97b8805264afe5efcd8ac8544724c860be7c1a
 class SchedulingListView(ListView):
     model = Scheduling
     context_object_name = "schedulings"
