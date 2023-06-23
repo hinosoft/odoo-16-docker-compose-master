@@ -147,16 +147,28 @@
             <div class="block block-three"></div>
             <div class="block block-four"></div>
             <a href="javascript:void(0)">
-              <img class="avatar" src="{{ ASSETS_ROOT }}/img/emilyz.jpg" alt="...">
-              <h5 class="title">Mike Andrew</h5>
+              <h5 class="title">Tên ca :
+                <label id="shift_name"> 8A</label>
+              </h5>
             </a>
-            <p class="description">
-              Ceo/Co-Founder
-            </p>
           </div>
         </p>
         <div class="card-description">
-          Do not be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...
+          <p>Giờ bắt đầu : 
+            <label id="start_work_time">{{start_work_time}}</label>
+          </p>
+          <p>Giờ kết thúc: 
+            <label id="end_work_time">{{end_work_time}}</label>
+          </p>
+          <p>Tổng giờ làm: 
+            <label id="total_work_time">{{total_work_time}}</label>
+          </p>   
+          <p>Giờ bắt đầu nghỉ: 
+            <label id="start_rest_time">{{start_rest_time}}</label>
+          </p>
+          <p>Giờ kết thúc nghỉ: 
+            <label id="end_rest_time">{{end_rest_time}}</label>
+          </p>
         </div>
       </div>
       <div class="card-footer">
@@ -176,7 +188,7 @@
   </div>
 </div>
 
-
+<div>
     <div class="row data">
       {% for department_data in schedulings %}
       <div class="col-md-12">
@@ -278,6 +290,7 @@
       
     </div>
   </div>
+</div>
 
 {% endblock content %}
 

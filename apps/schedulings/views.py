@@ -13,6 +13,7 @@ def reducer(acc,el):
         acc[group].append(el['name_employee'])
     return acc
 
+
 class SchedulingListView(ListView):
     model = Scheduling
     context_object_name = "schedulings"
@@ -36,7 +37,7 @@ class SchedulingListView(ListView):
         # df = pd.DataFrame.from_records(self.get_queryset())
         df = pd.DataFrame.from_records(
             Scheduling.objects.all().values_list('department_name', 'name_employee','employee_code', 'date', 'shift_name'))
-        print("11111",(df.columns))
+        # print("11111",df)
         
         df['weekday'] = df.apply(lambda row:row[3].weekday(), axis=1)
         
@@ -53,7 +54,7 @@ class SchedulingListView(ListView):
                     item[f'D{sub_g}'] = fist_row[4]
                 group_data.append(item)
             results.append({'department':g, 'data':group_data})
-            print(g)
+            print("dasdas",g)
         # print(queryset)
         context["schedulings"] = results
         # print(reduce(reducer, context["schedulings"], {}))
@@ -64,3 +65,5 @@ class SchedulingListView(ListView):
         #     if len(departments)>0:
         #         departments = departments
         return context
+    
+    
