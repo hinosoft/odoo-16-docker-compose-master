@@ -68,25 +68,25 @@
                 <thead class=" text-primary">
                   <tr>
                     <th>
-                      <button id = "btn_off" onclick="changeData(this,'OFF')" >OFF</button>
+                      <button id = "btn_off" onclick="getData(this,'OFF')" >OFF</button>
                     </th>
                     <th>
-                      <button id = "btn_ph" onclick="changeData(this,'PH')">PH</button>
+                      <button id = "btn_ph" onclick="getData(this,'PH')">PH</button>
                     </th>
                     <th>
-                      <button id = "btn_cl" onclick="changeData(this,'CL')">CL</button>
-                      <button id = "btn_al" onclick="changeData(al)">AL</button>
+                      <button id = "btn_cl" onclick="getData(this,'CL')">CL</button>
+                      <button id = "btn_al" onclick="getData(al)">AL</button>
                     </th>
                     <th class="text-center">
-                      <button id = "btn_5a" onclick="changeData(this,'5A')">5A</button>
-                      <button id = "btn_6a" onclick="changeData(this,'6A')">6A</button>
-                      <button id = "btn_7a" onclick="changeData(this,'7A')">7A</button>
-                      <button id = "btn_8a" onclick="changeData(this,'8A')">8A</button>
-                      <button id = "btn_9a" onclick="changeData(this,'9A')">9A</button>
-                      <button id = "btn_10a" onclick="changeData(this,'10A')">10A</button>
-                      <button id = "btn_11a" onclick="changeData(this,'11A')">11A</button>
-                      <button id = "btn_12a" onclick="changeData(this,'12A')">12A</button>
-                      <button id = "btn_13a" onclick="changeData(this,'13A')">13A</button>
+                      <button id = "btn_5a" onclick="getData(this,'5A')">5A</button>
+                      <button id = "btn_6a" onclick="getData(this,'6A')">6A</button>
+                      <button id = "btn_7a" onclick="getData(this,'7A')">7A</button>
+                      <button id = "btn_8a" onclick="getData(this,'8A')">8A</button>
+                      <button id = "btn_9a" onclick="getData(this,'9A')">9A</button>
+                      <button id = "btn_10a" onclick="getData(this,'10A')">10A</button>
+                      <button id = "btn_11a" onclick="getData(this,'11A')">11A</button>
+                      <button id = "btn_12a" onclick="getData(this,'12A')">12A</button>
+                      <button id = "btn_13a" onclick="getData(this,'13A')">13A</button>
                     </th>
                     
                   </tr>
@@ -95,36 +95,36 @@
                 
                   <tr>
                     <td>
-                      <button id = "btn_sp1" onclick="changeData(this,'SP1')">SP1</button>
+                      <button id = "btn_sp1" onclick="getData(this,'SP1')">SP1</button>
                     </td>
                     <td>
-                      <button id = "btn_sp2" onclick="changeData(this,'SP2')">SP2</button>
+                      <button id = "btn_sp2" onclick="getData(this,'SP2')">SP2</button>
                     </td>
                     <td>
-                      <button id = "btn_sp3" onclick="changeData(this,'SP3')">SP3</button>
-                      <button id = "btn_sp4" onclick="changeData(this,'SP4')">SP4</button>
+                      <button id = "btn_sp3" onclick="getData(this,'SP3')">SP3</button>
+                      <button id = "btn_sp4" onclick="getData(this,'SP4')">SP4</button>
                     </td>
                     <td class="text-center">
-                      <button id = "btn_5b" onclick="changeData(this,'5B')">5B</button>
-                      <button id = "btn_6b" onclick="changeData(this,'6B')">6B</button>
-                      <button id = "btn_7b" onclick="changeData(this,'7B')">7B</button>
-                      <button id = "btn_8b" onclick="changeData(this,'8B')">8B</button>
-                      <button id = "btn_9b" onclick="changeData(this,'9B')">9B</button>
-                      <button id = "btn_10b" onclick="changeData(this,'10B')">10B</button>
-                      <button id = "btn_11b" onclick="changeData(this,'11B')">11B</button>
-                      <button id = "btn_12b" onclick="changeData(this,'12B')">12B</button>
-                      <button id = "btn_13b" onclick="changeData(this,'13B')">13B</button>
+                      <button id = "btn_5b" onclick="getData(this,'5B')">5B</button>
+                      <button id = "btn_6b" onclick="getData(this,'6B')">6B</button>
+                      <button id = "btn_7b" onclick="getData(this,'7B')">7B</button>
+                      <button id = "btn_8b" onclick="getData(this,'8B')">8B</button>
+                      <button id = "btn_9b" onclick="getData(this,'9B')">9B</button>
+                      <button id = "btn_10b" onclick="getData(this,'10B')">10B</button>
+                      <button id = "btn_11b" onclick="getData(this,'11B')">11B</button>
+                      <button id = "btn_12b" onclick="getData(this,'12B')">12B</button>
+                      <button id = "btn_13b" onclick="getData(this,'13B')">13B</button>
                     </td>
                   </tr>
                   <tr>
                     <td>
                     </td>
                     <td>
-                      <button id = "btn_sp5" onclick="changeData(this,'SP5')">SP5</button>
+                      <button id = "btn_sp5" onclick="getData(this,'SP5')">SP5</button>
                     </td>
                     <td>
-                      <button id = "btn_sp6" onclick="changeData(this,'SP6')">SP6</button>
-                      <button id = "btn_sp7" onclick="changeData(this,'SP7')">SP7</button>
+                      <button id = "btn_sp6" onclick="getData(this,'SP6')">SP6</button>
+                      <button id = "btn_sp7" onclick="getData(this,'SP7')">SP7</button>
                     </td>
                     <td class="text-center">
                       
@@ -297,38 +297,29 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-  
-
-function changeData(checkbox, newtext) {
-  var checkedIds = [];
-  var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-  for (var i = 0; i < checkboxes.length; i++) {
-    if (checkboxes[i].checked) {
-      checkedIds.push(checkboxes[i].id); 
+  var modifiedIds = [];
+  function changeData(checkbox, newtext) {
+    var checkedIds = [];
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    for (var i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) {
+        checkedIds.push(checkboxes[i].id); 
+      }
     }
+    modifiedIds = checkedIds.map(function(id) {
+      return id + '_scheduling';
+    });
   }
-  var modifiedIds = checkedIds.map(function(id) {
-    return id + '_scheduling';
-  });
-  console.log(modifiedIds);
-
-  for (var j = 0; j < modifiedIds.length; j++) {
-    var label = document.getElementById(modifiedIds[j]);
-    if (label) {
-      // Thay đổi text của label ở đây
-      label.textContent = newtext;
-    }
+  console.log(newtext);
+  function getData(btn) {
+    var buttonText = btn.innerHTML;
+    for (var j = 0; j < modifiedIds.length ;j++) {
+      var label = document.getElementById(modifiedIds[j]);
+      if (label ) {
+        label.textContent = buttonText;
+      }
   }
 }
-
-var checkboxes = document.querySelectorAll('input[type="checkbox"]');
-checkboxes.forEach(function(checkbox) {
-  checkbox.addEventListener('change', function() {
-    var newtext = " ";
-    changeData(this, newtext);
-  });
-});
-
     
 </script>
 {% endblock javascripts %}
