@@ -12,20 +12,21 @@ def reducer(acc,el):
     else:
         acc[group].append(el['name_employee'])
     return acc
-<<<<<<< HEAD
-
-
-=======
 class GetSchedulingDetailView(View):
     def get(self, request, *args, **kwargs):
         return JsonResponse(
             {
                 # "asinid": self.asin_obj.id,
-                "command": 1,
-                'next_url': 1
+                "id":1,
+                "shift_name": '8A',
+                'start_work_time': '08:00',
+                'end_work_time':'17:00',
+                'total_work_time':'8:00',
+                'start_rest_time':'12:00',
+                'end_rest_time':'13:00',
+                'eatting_shifts' : 'Ăn Trưa'
             }
         )
->>>>>>> 3c97b8805264afe5efcd8ac8544724c860be7c1a
 class SchedulingListView(ListView):
     model = Scheduling
     context_object_name = "schedulings"

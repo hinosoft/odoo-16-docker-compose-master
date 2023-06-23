@@ -39,7 +39,9 @@
 {% endblock stylesheets %}
 
 {% block content %}
-
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
   <div class="content">
     <div class="col-md-12 row12">
     <div class="col-md-8">
@@ -147,9 +149,7 @@
             <div class="block block-three"></div>
             <div class="block block-four"></div>
             <a href="javascript:void(0)">
-              <h5 class="title">Tên ca :
-                <label id="shift_name"> 8A</label>
-              </h5>
+              <h5>Tên ca: <span id="shiftName"></span></h5>
             </a>
           </div>
         </p>
@@ -297,6 +297,30 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
+  $(document).ready(function() {
+    $.ajax({
+        url: 'http://127.0.0.1:8000/schedulings/detail', 
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            $('#result').text(JSON.stringify(data));
+            var shiftName = data.shift_name;
+            var startWorkTime = data.start_work_time;
+            var endWorkTime = data.end_work_time;
+           
+            $('#shiftName').text(shiftName);
+            $('#startWorkTime').text(startWorkTime);
+            $('#endWorkTime').text(endWorkTime);
+
+        },
+        error: function(xhr, status, error) {
+            console.log(error);
+        }
+    });
+});
+
+
+
   var modifiedIds = [];
   function changeData(checkbox, newtext) {
     var checkedIds = [];
@@ -310,7 +334,6 @@
       return id + '_scheduling';
     });
   }
-  console.log(newtext);
   function getData(btn) {
     var buttonText = btn.innerHTML;
     for (var j = 0; j < modifiedIds.length ;j++) {
