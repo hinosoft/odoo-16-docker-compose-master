@@ -9,7 +9,7 @@ scheduling.sync_data_scheduling()
 # merge_infomation_to_d
 
 att = AttendenceModel()
-att.from_excel('C:/Users/Admin/Downloads/DLCC Mũi Né 16.5.23_full.xlsx')
+att.from_excel('C:/Users/Admin/Desktop/Mũi Né 1-20.6.xlsx')
 
 scheduling.merge_download_attendance()
 scheduling.merge_scheduling_ver()
