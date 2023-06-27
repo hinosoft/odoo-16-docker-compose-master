@@ -4,7 +4,23 @@
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}
+
 <style>
+  card-plain {
+    position: fixed;
+    left:0px;
+    right:0px;
+    top:100px;
+  }
+
+  .data {
+    
+  }
+
+  .row12 {
+    display: flex;
+  }
+
   table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
@@ -18,105 +34,162 @@
     background-color: rgba(150, 212, 212, 0.4);
   }
   </style>
+
+  
 {% endblock stylesheets %}
 
 {% block content %}
-
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+</head>
   <div class="content">
-    <div class="row">
-      
+    <div class="col-md-12 row12">
+    <div class="col-md-8">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card ">
+            <div class="card-header">
+              <h4 class="card-title">Dữ liệu chấm công</h4>
+              <p class="category"><a>5/2023</a>
+                <a class="btn">Next</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="col-md-12">
-        <div class="card ">
+        <div class="card  card-plain">
           <div class="card-header">
-            <h4 class="card-title">Dữ liệu chấm công</h4>
-            <p class="category"><a>5/2023</a>
-              <a class="btn">Next</a>
-            </p>
+            <h4 class="card-title">DANH SÁCH CA</h4>
+            <p class="category"> Here is a subtitle for this table</p>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-12">
-      <div class="card  card-plain">
-        <div class="card-header">
-          <h4 class="card-title">DANH SÁCH CA</h4>
-          <p class="category"> Here is a subtitle for this table</p>
-        </div>
-        <div class="card-body">
-          <div class="table-responsive">
-            <table class="table tablesorter" id="">
-              <thead class=" text-primary">
-                <tr>
-                  <th>
-                    <button>OFF</button>
-                  </th>
-                  <th>
-                    <button>PH</button>
-                  </th>
-                  <th>
-                    <button>CL</button>
-                    <button>AL</button>
-                  </th>
-                  <th class="text-center">
-                    <button>5A</button>
-                    <button>6A</button>
-                    <button>7A</button>
-                    <button>8A</button>
-                    <button>9A</button>
-                    <button>10A</button>
-                    <button>11A</button>
-                    <button>12A</button>
-                    <button>13A</button>
-                  </th>
-                  
-                </tr>
-              </thead>
-              <tbody>
-               
-                <tr>
-                  <td>
-                    <button>SP1</button>
-                  </td>
-                  <td>
-                    <button>SP2</button>
-                  </td>
-                  <td>
-                    <button>SP3</button>
-                    <button>SP4</button>
-                  </td>
-                  <td class="text-center">
-                    <button>5B</button>
-                    <button>6B</button>
-                    <button>7B</button>
-                    <button>8B</button>
-                    <button>9B</button>
-                    <button>10B</button>
-                    <button>11B</button>
-                    <button>12B</button>
-                    <button>13B</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                  </td>
-                  <td>
-                    <button>SP5</button>
-                  </td>
-                  <td>
-                    <button>SP6</button>
-                    <button>SP7</button>
-                  </td>
-                  <td class="text-center">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table tablesorter" id="">
+                <thead class=" text-primary">
+                  <tr>
+                    <th>
+                      <button id = "btn_off" onclick="getData(this,'OFF')" >OFF</button>
+                    </th>
+                    <th>
+                      <button id = "btn_ph" onclick="getData(this,'PH')">PH</button>
+                    </th>
+                    <th>
+                      <button id = "btn_cl" onclick="getData(this,'CL')">CL</button>
+                      <button id = "btn_al" onclick="getData(al)">AL</button>
+                    </th>
+                    <th class="text-center">
+                      <button id = "btn_5a" onclick="getData(this,'5A')">5A</button>
+                      <button id = "btn_6a" onclick="getData(this,'6A')">6A</button>
+                      <button id = "btn_7a" onclick="getData(this,'7A')">7A</button>
+                      <button id = "btn_8a" onclick="getData(this,'8A')">8A</button>
+                      <button id = "btn_9a" onclick="getData(this,'9A')">9A</button>
+                      <button id = "btn_10a" onclick="getData(this,'10A')">10A</button>
+                      <button id = "btn_11a" onclick="getData(this,'11A')">11A</button>
+                      <button id = "btn_12a" onclick="getData(this,'12A')">12A</button>
+                      <button id = "btn_13a" onclick="getData(this,'13A')">13A</button>
+                    </th>
                     
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  </tr>
+                </thead>
+                <tbody>
+                
+                  <tr>
+                    <td>
+                      <button id = "btn_sp1" onclick="getData(this,'SP1')">SP1</button>
+                    </td>
+                    <td>
+                      <button id = "btn_sp2" onclick="getData(this,'SP2')">SP2</button>
+                    </td>
+                    <td>
+                      <button id = "btn_sp3" onclick="getData(this,'SP3')">SP3</button>
+                      <button id = "btn_sp4" onclick="getData(this,'SP4')">SP4</button>
+                    </td>
+                    <td class="text-center">
+                      <button id = "btn_5b" onclick="getData(this,'5B')">5B</button>
+                      <button id = "btn_6b" onclick="getData(this,'6B')">6B</button>
+                      <button id = "btn_7b" onclick="getData(this,'7B')">7B</button>
+                      <button id = "btn_8b" onclick="getData(this,'8B')">8B</button>
+                      <button id = "btn_9b" onclick="getData(this,'9B')">9B</button>
+                      <button id = "btn_10b" onclick="getData(this,'10B')">10B</button>
+                      <button id = "btn_11b" onclick="getData(this,'11B')">11B</button>
+                      <button id = "btn_12b" onclick="getData(this,'12B')">12B</button>
+                      <button id = "btn_13b" onclick="getData(this,'13B')">13B</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                    </td>
+                    <td>
+                      <button id = "btn_sp5" onclick="getData(this,'SP5')">SP5</button>
+                    </td>
+                    <td>
+                      <button id = "btn_sp6" onclick="getData(this,'SP6')">SP6</button>
+                      <button id = "btn_sp7" onclick="getData(this,'SP7')">SP7</button>
+                    </td>
+                    <td class="text-center">
+                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card card-user">
+      <div class="card-body">
+        <p class="card-text">
+          <div class="author">
+            <div class="block block-one"></div>
+            <div class="block block-two"></div>
+            <div class="block block-three"></div>
+            <div class="block block-four"></div>
+            <a href="javascript:void(0)">
+              <h5>Tên ca: <span id="shiftName"></span></h5>
+            </a>
+          </div>
+        </p>
+        <div class="card-description">
+          <p>Giờ bắt đầu : 
+            <label id="start_work_time">{{start_work_time}}</label>
+          </p>
+          <p>Giờ kết thúc: 
+            <label id="end_work_time">{{end_work_time}}</label>
+          </p>
+          <p>Tổng giờ làm: 
+            <label id="total_work_time">{{total_work_time}}</label>
+          </p>   
+          <p>Giờ bắt đầu nghỉ: 
+            <label id="start_rest_time">{{start_rest_time}}</label>
+          </p>
+          <p>Giờ kết thúc nghỉ: 
+            <label id="end_rest_time">{{end_rest_time}}</label>
+          </p>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="button-container">
+          <button href="javascript:void(0)" class="btn btn-icon btn-round btn-facebook">
+            <i class="fab fa-facebook"></i>
+          </button>
+          <button href="javascript:void(0)" class="btn btn-icon btn-round btn-twitter">
+            <i class="fab fa-twitter"></i>
+          </button>
+          <button href="javascript:void(0)" class="btn btn-icon btn-round btn-google">
+            <i class="fab fa-google-plus"></i>
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="row">
+  </div>
+</div>
+
+<div>
+    <div class="row data">
       {% for department_data in schedulings %}
       <div class="col-md-12">
         <div class="card ">
@@ -175,27 +248,33 @@
                       {{ scheduling.name_employee }}
                     </td>
                     <td class="text-center">
-                      <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
-                      <label for="vehicle1"> {{ scheduling.D0 }}</label><br>
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T2" name="vehicle1">
+                      <label for="{{ scheduling.employee_code }}_T2" id="{{ scheduling.employee_code }}_T2_scheduling"> {{ scheduling.D0 }}</label><br>
                     </td>
                     <td class="text-center">
-                      <input type="checkbox" id="vehicle1_2" name="vehicle1_2" value="Bike">
-                      <label for="vehicle1"> {{ scheduling.D1 }}</label><br>
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T3">
+                      <label for="{{ scheduling.employee_code }}_T3" id="{{ scheduling.employee_code }}_T3_scheduling"> {{ scheduling.D1 }}</label><br>
                     </td>
                     <td class="text-center">
-                      {{scheduling.D2}}
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T4">
+                      <label for="{{ scheduling.employee_code }}_T4" id="{{ scheduling.employee_code }}_T4_scheduling"> {{ scheduling.D2 }}</label><br>
+                    </td>
                     </td>
                     <td class="text-center">
-                      {{scheduling.D3}}
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T5">
+                      <label for="{{ scheduling.employee_code }}_T5" id="{{ scheduling.employee_code }}_T5_scheduling"> {{ scheduling.D3 }}</label><br>
                     </td>
                     <td class="text-center">
-                      {{scheduling.D4}}
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T6">
+                      <label for="{{ scheduling.employee_code }}_T6" id="{{ scheduling.employee_code }}_T6_scheduling"> {{ scheduling.D4 }}</label><br>
                     </td>
                     <td class="text-center">
-                      {{scheduling.D5}}
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_T7">
+                      <label for="{{ scheduling.employee_code }}_T7" id="{{ scheduling.employee_code }}_T7_scheduling"> {{ scheduling.D5 }}</label><br>
                     </td>
                     <td class="text-center">
-                      {{scheduling.D6}}
+                      <input type="checkbox" onclick="changeData(this)" id="{{ scheduling.employee_code }}_CN">
+                      <label for="{{ scheduling.employee_code }}_CN" id="{{ scheduling.employee_code }}_CN_scheduling"> {{ scheduling.D6 }}</label><br>
                     </td>
                   </tr>
                   {% endfor %}
@@ -211,8 +290,59 @@
       
     </div>
   </div>
+</div>
 
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script>
+  $(document).ready(function() {
+    $.ajax({
+        url: 'http://127.0.0.1:8000/schedulings/detail', 
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            $('#result').text(JSON.stringify(data));
+            var shiftName = data.shift_name;
+            var startWorkTime = data.start_work_time;
+            var endWorkTime = data.end_work_time;
+           
+            $('#shiftName').text(shiftName);
+            $('#startWorkTime').text(startWorkTime);
+            $('#endWorkTime').text(endWorkTime);
+
+        },
+        error: function(xhr, status, error) {
+            console.log(error);
+        }
+    });
+});
+
+
+
+  var modifiedIds = [];
+  function changeData(checkbox, newtext) {
+    var checkedIds = [];
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    for (var i = 0; i < checkboxes.length; i++) {
+      if (checkboxes[i].checked) {
+        checkedIds.push(checkboxes[i].id); 
+      }
+    }
+    modifiedIds = checkedIds.map(function(id) {
+      return id + '_scheduling';
+    });
+  }
+  function getData(btn) {
+    var buttonText = btn.innerHTML;
+    for (var j = 0; j < modifiedIds.length ;j++) {
+      var label = document.getElementById(modifiedIds[j]);
+      if (label ) {
+        label.textContent = buttonText;
+      }
+  }
+}
+    
+</script>
+{% endblock javascripts %}
