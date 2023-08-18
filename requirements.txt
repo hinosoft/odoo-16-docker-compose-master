@@ -17,3 +17,4 @@ importlib-metadata==6.6.0
 markdown==3.4.3 
 zipp==3.15.0
 pandas==1.5.3
+openpyxl

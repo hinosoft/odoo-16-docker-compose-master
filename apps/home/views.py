@@ -8,7 +8,11 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template import loader
 from django.urls import reverse
-
+from openpyxl import Workbook
+try: 
+    from openpyxl.cell import get_column_letter
+except ImportError:
+    from openpyxl.utils import get_column_letter
 
 @login_required(login_url="/login/")
 def index(request):
@@ -42,3 +46,16 @@ def pages(request):
     except:
         html_template = loader.get_template('home/page-500.html')
         return HttpResponse(html_template.render(context, request))
+import openpyxl
+def download_report(request):
+    
+    wb = Workbook()
+    wb = openpyxl.load_workbook('apps/home/Summary time attendant.xlsx')
+    ws = wb.create_sheet()
+    ws.title = "Pi"
+    for start_row in range(1,100):
+        ws.cell(row=start_row, column=6).value = start_row
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    wb.save(response)
+    return response
+
